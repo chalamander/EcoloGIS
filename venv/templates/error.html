@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<title>EcoloGIS</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<head>
+    <link href="https://fonts.googleapis.com/css?family=PT+Sans" rel="stylesheet">
+    <link rel="stylesheet" href="https://meyerweb.com/eric/tools/css/reset/reset.css">
+    <link rel="stylesheet" href="../../static/styles.css">
+</head>
+
+<body>
+    <div class="split leftpane" id="error">
+        <div class="centeredbox">
+            <div class="contentbox titles">
+                <h1 class="title"> EcoloGIS </h1>
+                <h2 class="title"> Error </h3>
+            </div>
+            <div class="contentbox">
+                {% with messages = get_flashed_messages() %}
+                  {% if messages %}
+                    <ul class=flashes>
+                    {% for message in messages %}
+                      <li>{{ message }}</li>
+                    {% endfor %}
+                    </ul>
+                  {% endif %}
+                {% endwith %}
+            </div>
+            <div class="contentbox bottom">
+                <input class="button left" id="errorbtn" type=submit value="Back" onclick="window.history.go(-1); return false;">
+            </div>
+        </div>
+    </div>
+    <div class="split rightpane titlearea">
+        <div class="bigtitle" id="errortext">Error</div>
+    </div>
+</body>
+
+</html>

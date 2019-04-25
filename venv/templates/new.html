@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<title>EcoloGIS</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<head>
+    <link href="https://fonts.googleapis.com/css?family=PT+Sans" rel="stylesheet">
+    <link rel="stylesheet" href="https://meyerweb.com/eric/tools/css/reset/reset.css">
+    <link rel="stylesheet" href="../static/styles.css">
+</head>
+
+<body>
+    <div class="split leftpane">
+        <div class="centeredbox">
+            <div class="contentbox titles">
+                <h1 class="title"> EcoloGIS </h1>
+                <h2 class="title"> Create new study </h3>
+            </div>
+            <form method=post enctype=multipart/form-data>
+                <div class="contentbox">
+                    <input class="left contentbox" type=file name=file required>
+                </div>
+                <div class="contentbox">
+                    <h2 class="titles left"> Author </h3>
+                    <input type="entry" class="left fullentry" name="author"/>
+                </div>
+                <div class="contentbox">
+                    <h2 class="titles left"> Description </h3>
+                    <textarea class="left fullentry" rows="4" cols="50" placeholder="Enter a description of the study" name="description"></textarea>
+                </div>
+                <div class="contentbox bottom">
+                    <input class="button left" type=submit value="Create">
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="split rightpane titlearea">
+        <div class="bigtitle">EcoloGIS.</div>
+    </div>
+</body>
+
+</html>

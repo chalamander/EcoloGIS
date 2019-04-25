@@ -1,0 +1,92 @@
+<html>
+<title>EcoloGIS</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<head>
+    <link href="https://fonts.googleapis.com/css?family=PT+Sans" rel="stylesheet">
+    <script src="https://unpkg.com/deck.gl@~5.2.0/deckgl.min.js"></script>
+    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.44.1/mapbox-gl.js"></script>
+    <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.44.1/mapbox-gl.css" rel="stylesheet" />
+    <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+    <link rel="stylesheet" href="../../static/styles.css">
+</head>
+
+<body>
+    <div class="split leftpane" id="smallpane">
+        <div class="centeredbox">
+            <div class="contentbox titles">
+                <h1 class="title"> EcoloGIS </h1>
+                <h2 class="title"> Visualisation </h3>
+            </div>
+            <div class="contentbox description">
+                <div class="subheadings">
+                    <h3 class="subheading"> Visualisation Type </h2>
+                </div>
+                <p> {{visualisation_name}} </p>
+            </div>
+            {% with messages = get_flashed_messages() %}
+              {% if messages %}
+                <ul class=flashes>
+                {% for message in messages %}
+                  <li>{{ message }}</li>
+                {% endfor %}
+                </ul>
+              {% endif %}
+            {% endwith %}
+            <div class="contentbox bottom">
+                <input class="button left" type=submit value="Back" onclick="window.history.go(-1); return false;">
+            </div>
+        </div>
+    </div>
+    <div class="split rightpane" id="largepane">
+        <div id="map">
+
+        </div>
+    </div>
+</body>
+<script type="text/javascript">
+    isDensity = {% if vis_type == 'StackedSpaceTimeDensities' %} true{% else %}false{% endif %};
+
+    $.ajax ({ url: "../../static/data/{{data_id}}_points.geojson",
+    method: "GET",
+    cache: false})
+    .success(function (response) {
+        var jsonPositionData = $.parseJSON (response);
+        if(jsonPositionData){
+            const pclayer = new PointCloudLayer({
+                id: 'point-cloud-layer',
+                data: jsonPositionData,
+                pickable: false,
+                coordinateOrigin: [0,0],
+                radiusPixels: isDensity ? 5 : 7,
+                getPosition: d => d.position,
+                getNormal: d => d.normal,
+                getColor: d => d.color,
+                lightSettings: {},
+                onHover: ({object, x, y}) => {
+                  const tooltip = object.position.join(', ');
+                  /* Update tooltip
+                     http://deck.gl/#/documentation/developer-guide/adding-interactivity?section=example-display-a-tooltip-for-hovered-object
+                  */
+                }
+            });
+
+            const deckgl = new deck.DeckGL({
+                mapboxApiAccessToken: 'pk.eyJ1IjoicG9zdGdhdGMiLCJhIjoiY2pvYTZ4N2ZxMGM0MTNybXJobG93cWtxaCJ9.aGeOT-Y6Jh6jnJFhOKXgKQ',
+                container: 'map',
+                mapStyle: 'mapbox://styles/mapbox/{{map_style}}',
+                longitude: {{startlong}},
+                latitude: {{startlat}},
+                zoom: 11,
+                pitch: 60,
+                bearing: 0,
+                layers: [
+                    pclayer
+                ]
+            });
+        }
+    });
+</script>
+
+</html>

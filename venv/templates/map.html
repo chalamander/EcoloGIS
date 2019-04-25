@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html>
+<title>EcoloGIS</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<head>
+    <link href="https://fonts.googleapis.com/css?family=PT+Sans" rel="stylesheet">
+    <link rel="stylesheet" href="https://meyerweb.com/eric/tools/css/reset/reset.css">
+    <link rel="stylesheet" href="../../static/styles.css">
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.53.0/mapbox-gl.js'></script>
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.53.0/mapbox-gl.css' rel='stylesheet' />
+    <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+</head>
+
+<body>
+    <div class="split leftpane">
+        <div class="centeredbox">
+            <div class="contentbox titles">
+                <h1 class="title"> {{study_name}} </h1>
+                <h2 class="title"> {{author}} </h3>
+            </div>
+            <div class="contentbox description">
+                <div class="subheadings left">
+                    <h3 class="subheading left"> Study Info </h2>
+                </div>
+                <p>
+                    {{description}}
+                </p>
+                <br/>
+                <p> Number of Locations: <b>{{num_points}}</b> </p>
+                <p> Time of First Location: <b>{{full_start_date}}</b> </p>
+                <p> Time of Last Location: <b>{{full_end_date}}</b> </p>
+                <p> Number of Unique Entities: <b>{{num_unique_entities}}</b> </p>
+            </div>
+            <form method="get">
+                <div class="contentbox">
+                    <div class="subheadings">
+                        <h3 class="subheading"> Select Map Style </h2>
+                    </div>
+                    <div class="optionselector left half" id="layerlist">
+                        <div class="left half">
+                            <input type="radio" name="mapstyle" value="dark-v10" required> Dark<br>
+                            <input type="radio" name="mapstyle" value="light-v10"> Light<br>
+                            <input type="radio" name="mapstyle" value="streets-v11"> Streets
+                        </div>
+                        <div class="left half">
+                            <input type="radio" name="mapstyle" value="outdoors-v11"> Outdoors<br>
+                            <input type="radio" name="mapstyle" value="satellite-v9"> Satellite
+                        </div>
+                    </div>
+                </div>
+                {% if not is_filtered %}
+                <div class="contentbox">
+                    <div class="subheadings left">
+                        <h3 class="subheading left"> Create Data Slice </h2>
+                    </div>
+                    <div class="subsubheadings left">
+                        <p class="subsubheading left"> Start Date </p>
+                        <p class="subsubheading right"> Start Time </p>
+                    </div>
+                    <input class="halfentry left" id="startdateentry" type="date" name="startdate" min="{{start_date}}" max="{{end_date}}" required/>
+                    <input class="halfentry right" id="starttimeentry" type="time" name="starttime" required/>
+                    <div class="subsubheadings left">
+                        <br />
+                        <p class="subsubheading left"> Length of time (s) </p>
+                        <p class="subsubheading right"> Individual </p>
+                    </div>
+                    <input class="halfentry left" id="timelengthentry" type="entry" name="timelength" required/>
+                    <select name="individual" class="halfdropdown right">
+                        <option value="all"> - All -</option>
+                        {% for id,(pretty_id, name) in individual_id_list.items()|sort(attribute='1') %}
+                        <option value='{{id}}'>{{pretty_id}}: {{name}}</option>
+                        {% endfor %}
+                    </select>
+                    <div class="subsubheadings left">
+                        <br />
+                        <p class="subsubheading left"> Use all data (override) </p>
+                        <input class="" id="usealldatabox" type="checkbox" value=1 name="usealldata" onclick="usealldatachecked();"/>
+                    </div>
+                </div>
+                <input class="button" type="submit" value="Slice">
+                {% endif %}
+            </form>
+            {% if is_filtered %}
+            <div class="contentbox">
+                <div class="subheadings left">
+                    <h3 class="subheading left"> Time Slice Info </h2>
+                    <form class="right" action="/map/{{fulldata_id}}">
+                        <input class="button closebutton" type="submit" value="X">
+                    </form>
+                </div>
+                <div class="contentbox description">
+                    <p> Number of Locations: <b>{{filtered_num_points}}</b> </p>
+                    <p> Slice Start: <b>{{filtered_start_date}}</b> </p>
+                    <p> Slice End: <b>{{filtered_end_date}}</b> </p>
+                    <p> Number of Included Individuals: <b>{{filtered_individuals|length}}</b> </p>
+                    <p> Included Individual Identifiers: </p>
+                    <div id="itemlist">
+                        <ul>
+                            {% for name in filtered_individuals%}
+                            <li>
+                                {{name}}
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <form method='GET' action="/visualise/{{filtereddata_id}}">
+                <div class="contentbox">
+                    <div class="subheadings left">
+                        <h3 class="subheading left"> Visualise </h2>
+                    </div>
+                    <div class="left half subsubheading">
+                        <p class="left">
+                            Type:
+                        </p>
+                    </div>
+                    <div class="right half subsubheading">
+                        <p class="right">
+                            Map Style:
+                        </p>
+                    </div>
+                    <div class="optionselector left">
+                        <input type="radio" name="visualisationtype" value="StackedSpaceTimeDensities" checked="checked" required> Stacked Space Time Densities<br>
+                        <input type="radio" name="visualisationtype" value="XYT"> X,Y,T
+                    </div>
+                    <div class="optionselector right">
+                        <select name="mapstyle">
+                            <option value="dark-v9" required>Dark</option>
+                            <option value="light-v9" required>Light</option>
+                            <option value="streets-v10" required>Streets</option>
+                            <option value="outdoors-v10" required>Outdoors</option>
+                            <option value="satellite-v9" required>Satellite</option>
+                        </select>
+                    </div>
+                </div>
+                <input class="button" id="slicebutton" type="submit" value="Visualise">
+            </form>
+            {% endif %}
+        </div>
+    </div>
+    <div class="split rightpane">
+        <div id="map">
+
+        </div>
+        <script>
+            //setup data slicing requirement options
+            function usealldatachecked(){
+                start_date = document.getElementById('startdateentry');
+                start_time = document.getElementById('starttimeentry');
+                time_length = document.getElementById('timelengthentry');
+
+                if(document.getElementById('usealldatabox').checked){
+                    start_date.required = false;
+                    start_date.disabled = true;
+                    start_time.required = false;
+                    start_time.disabled = true;
+                    time_length.required = false;
+                    time_length.disabled = true;
+                }
+                else{
+                    start_date.required = true;
+                    start_date.disabled = false;
+                    start_time.required = true;
+                    start_time.disabled = false;
+                    time_length.required = true;
+                    time_length.disabled = false;
+                }
+            }
+
+            var mapStyle = '{{map_style}}';
+
+            mapboxgl.accessToken = 'pk.eyJ1IjoicG9zdGdhdGMiLCJhIjoiY2pvYTZ4N2ZxMGM0MTNybXJobG93cWtxaCJ9.aGeOT-Y6Jh6jnJFhOKXgKQ';
+
+            var map = new mapboxgl.Map({
+                container: 'map', // container id
+                style: 'mapbox://styles/mapbox/{{map_style}}',
+                // terrain: mapbox://styles/mapbox/outdoors-v9
+                // satellite: mapbox://styles/mapbox/satellite-streets-v9
+                // dark: mapbox://styles/mapbox/dark-v9
+                center: [{{long}},{{lat}}], // starting position [lng, lat]
+                zoom: 5 // starting zoom
+            });
+
+            //Setup layer selection methods
+            var layerList = document.getElementById('layerlist');
+            var inputs = layerList.getElementsByTagName('input');
+
+            function switchLayer(layer) {
+                var layerId = layer.target.attributes.value.value;
+                map.setStyle('mapbox://styles/mapbox/' + layerId);
+                mapStyle = layerId;
+                map.on('style.load', () => {
+                    const waiting = () => {
+                        if (!map.isStyleLoaded()) {
+                            setTimeout(waiting, 200);
+                        } else {
+                            loadData()
+                        }
+                    };
+                    waiting();
+                });
+            }
+
+            for (var i = 0; i < inputs.length; i++) {
+                inputs[i].onclick = switchLayer;
+            }
+
+            function loadData(){
+                $.ajax ({ url: "../../static/data/{{filtereddata_id}}.geojson",
+                method: "GET",
+                cache: false})
+                .success(function (response) {
+                    var jsonPositionData = $.parseJSON (response);
+                    if(jsonPositionData){
+                        // Add movement data to map as heatmap layer
+                        map.addSource('entity-positions', {
+                            "type": "geojson",
+                            "data": jsonPositionData
+                        });
+
+                        map.addLayer({
+                            "id": "entity-positions-heat",
+                            "type": "heatmap",
+                            "source": "entity-positions",
+                            "maxzoom": 9,
+                            "paint": {
+                            // Increase the heatmap weight based on frequency and property magnitude
+                            "heatmap-weight": 0.2,
+                            // Increase the heatmap color weight weight by zoom level
+                            // heatmap-intensity is a multiplier on top of heatmap-weight
+                            "heatmap-intensity": [
+                                "interpolate",
+                                ["linear"],
+                                ["zoom"],
+                                0, 1,
+                                9, 3
+                            ],
+                            // Color ramp for heatmap.  Domain is 0 (low) to 1 (high).
+                            // Begin color ramp at 0-stop with a 0-transparancy color
+                            // to create a blur-like effect.
+                            "heatmap-color": [
+                                "interpolate",
+                                ["linear"],
+                                ["heatmap-density"],
+                                0, "rgba(33,102,172,0)",
+                                0.2, "rgb(103,169,207)",
+                                0.4, "rgb(209,229,240)",
+                                0.6, "rgb(253,219,199)",
+                                0.8, "rgb(239,138,98)",
+                                1, "rgb(178,24,43)"
+                            ],
+                            // Adjust the heatmap radius by zoom level
+                            "heatmap-radius": [
+                                "interpolate",
+                                ["linear"],
+                                ["zoom"],
+                                0, 2,
+                                9, 20
+                            ],
+                            // Transition from heatmap to circle layer by zoom level
+                            "heatmap-opacity": [
+                                "interpolate",
+                                ["linear"],
+                                ["zoom"],
+                                15, 1,
+                                17, 0
+                                ],
+                            }
+                        });
+
+                        map.addLayer({
+                            "id": "entity-positions-point",
+                            "type": "circle",
+                            "source": "entity-positions",
+                            "minzoom": 7,
+                            "paint": {
+                                "circle-radius": 5,
+                                'circle-color': [
+                                    'interpolate',
+                                    ['linear'],
+                                    ['get', 'timestamp_epoch'],
+                                    {{starttime_epoch}}, '#F2F12D',
+                                    {{endtime_epoch}}, '#723122'
+                                ],
+                                "circle-stroke-color": "white",
+                                "circle-stroke-width": 1,
+                                "circle-stroke-opacity": 0,
+                                // Transition from heatmap to circle layer by zoom level
+                                "circle-opacity": [
+                                    "interpolate",
+                                    ["linear"],
+                                    ["zoom"],
+                                    9, 0,
+                                    10, 1
+                                ]
+                            },
+                        });
+                    }
+                });
+            }
+
+            var isLoaded;
+            map.on('load', function(){
+                if(!isLoaded){
+                    loadData()
+                    isLoaded = true;
+                }
+            });
+        </script>
+    </div>
+</body>
+</html>
