@@ -11,6 +11,10 @@ h6 { font-size: .75em; }
 
 b {font-weight: bold}
 
+.colourgradient{
+    width:100%;
+}
+
 .left{
     left:0px;
     float:left;

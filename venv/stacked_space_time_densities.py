@@ -29,7 +29,7 @@ def density_around_trajectory(current_line, kernel_size, xcoord, ycoord, zcoord,
     ny = (max_y_coord-(ynn+1)*min_y_coord)/y_range
     nz = (max_z_coord-(znn+1)*min_z_coord)/z_range
 
-    #initialise and empty vcoord (density Volume)
+    #initialise an empty vcoord (density Volume)
     vcoord = numpy.zeros(xcoord.shape)
 
     #get length of trajectory

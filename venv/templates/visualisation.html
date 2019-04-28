@@ -25,6 +25,29 @@
                 </div>
                 <p> {{visualisation_name}} </p>
             </div>
+            <div class="contentbox">
+                <div class="subheadings">
+                    <h3 class="subheading"> Legend </h2>
+                </div>
+                <p class="left">
+                    Probability level:
+                </p>
+                <img class="colourgradient" src="../../static/density_gradient.png" />
+                <div>
+                    <p class="left"> Low </p>
+                    <p class="right"> High </p>
+                </div>
+            </div>
+            <div class="contentbox">
+                <div class="subheadings">
+                    <h3 class="subheading"> Description </h2>
+                </div>
+                <div class="description">
+                    <p>
+                        
+                    </p>
+                </div>
+            </div>
             {% with messages = get_flashed_messages() %}
               {% if messages %}
                 <ul class=flashes>
@@ -66,9 +89,6 @@
                 lightSettings: {},
                 onHover: ({object, x, y}) => {
                   const tooltip = object.position.join(', ');
-                  /* Update tooltip
-                     http://deck.gl/#/documentation/developer-guide/adding-interactivity?section=example-display-a-tooltip-for-hovered-object
-                  */
                 }
             });
 
